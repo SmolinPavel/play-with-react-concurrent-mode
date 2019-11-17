@@ -1,7 +1,23 @@
-import React, { Suspense } from "react";
+import React, { Component, Suspense } from "react";
 import ReactDOM from "react-dom";
 
 import { fetchProfileData } from "./fakeApi";
+
+// Error boundaries currently have to be classes.
+class ErrorBoundary extends Component {
+  state = { hasError: false, error: null };
+  static getDerivedStateFromError(error) {
+    return {
+      hasError: true,
+      error
+    };
+  }
+  render() {
+    const { hasError } = this.state;
+    const { children, fallback } = this.props;
+    return hasError ? fallback : children;
+  }
+}
 
 const resource = fetchProfileData();
 
@@ -9,9 +25,11 @@ function ProfilePage() {
   return (
     <Suspense fallback={<h1>Loading profile...</h1>}>
       <ProfileDetails />
-      <Suspense fallback={<h1>Loading posts...</h1>}>
-        <ProfileTimeline />
-      </Suspense>
+      <ErrorBoundary fallback={<h2>Could not fetch posts.</h2>}>
+        <Suspense fallback={<h1>Loading posts...</h1>}>
+          <ProfileTimeline />
+        </Suspense>
+      </ErrorBoundary>
     </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 export function fetchProfileData() {
   let userPromise = fetchUser();
-  let postsPromise = fetchPosts();
+  let postsPromise = Promise.reject("Cannot fetch posts");
   return {
     user: wrapPromise(userPromise),
     posts: wrapPromise(postsPromise)
